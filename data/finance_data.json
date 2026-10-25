@@ -1,0 +1,30 @@
+[
+    {
+        "codigo": 1,
+        "data": "22/10/2026",
+        "tipo": "receita",
+        "categoria": "Salário",
+        "valor": 5000.0
+    },
+    {
+        "codigo": 2,
+        "data": "23/10/2026",
+        "tipo": "despesa",
+        "categoria": "refeição",
+        "valor": 50.0
+    },
+    {
+        "codigo": 3,
+        "data": "01/11/2026",
+        "tipo": "receita",
+        "categoria": "salario",
+        "valor": 5100.0
+    },
+    {
+        "codigo": 4,
+        "data": "24/10/2026",
+        "tipo": "despesa",
+        "categoria": "vestuario",
+        "valor": 100.0
+    }
+]

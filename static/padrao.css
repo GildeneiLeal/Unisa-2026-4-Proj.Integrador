@@ -1,0 +1,30 @@
+:root {
+    --pico-primary: #2b6cb0;          /* Cor principal (botões, links) */
+    --pico-primary-background: #2b6cb0;
+    --pico-font-size: 16px;            /* Tamanho base da fonte */
+}
+
+/* Deixa os títulos Legend em negrito e com tamanho 14 */
+legend {
+    font-weight: bold !important;
+    font-size: 23px !important;
+}
+
+.painel-principal {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.form-cadastro {
+    flex: 3;
+    min-width: 0;
+    border-style: solid;
+}
+
+.painel-resumo {
+    flex: 1;
+    min-width: 250px;
+    border-style: solid;
+}
