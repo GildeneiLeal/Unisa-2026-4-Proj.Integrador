@@ -228,3 +228,4 @@ def post(data: str, tipo: str, categoria: str, valor: float):
     return RedirectResponse("/", status_code=303)
 
 serve()
+
