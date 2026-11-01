@@ -1,30 +1,88 @@
 :root {
-    --pico-primary: #2b6cb0;          /* Cor principal (botões, links) */
+    --pico-primary: #2b6cb0;
     --pico-primary-background: #2b6cb0;
-    --pico-font-size: 16px;            /* Tamanho base da fonte */
+    --pico-font-size: 16px;
 }
 
-/* Deixa os títulos Legend em negrito e com tamanho 14 */
-legend {
-    font-weight: bold !important;
-    font-size: 23px !important;
+/* Ocupa a largura total da página de ponta a ponta com espaçamento lateral elegante */
+body > header, body > main, body > footer, .container {
+    max-width: 100% !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
+/* Estica os botões do menu superior uniformemente por toda a largura da tela */
+.menu-superior {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.menu-superior button {
+    flex: 1;
+    width: 100%;
+    text-align: center;
+    background-color: var(--pico-primary);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 0;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--pico-box-shadow);
+    transition: background-color 0.2s ease;
+}
+
+.menu-superior button:hover {
+    background-color: #1a4971;
+}
+
+/* Organização do formulário à esquerda e resumo à direita */
 .painel-principal {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
     width: 100%;
+/*    width: 1024px;*/
+/*    height: 960px;*/
+    margin: 0 auto;
 }
 
-.form-cadastro {
+.form_cadastro {
     flex: 3;
-    min-width: 0;
-    border-style: solid;
+    width: 80%;
+    margin-bottom: 0;
 }
 
 .painel-resumo {
+    flex: 3;
+    min-width: 280px;
+    max-width: 350px;
+    width: 100%;
+    /*width: 200px;*/
+    /*display: flex;*/
+    /*justify-content: flex-end;*/
+    /*flex-direction: row-reverse;*/
+}
+
+.campo-horizontal {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.campo-horizontal label {
+    flex: 0 0 200px;
+    margin-bottom: 0
+    font-weight: 600;
+    text-align: right;
+}
+
+.campo-horizontal input,
+.campo-horizontal select {
     flex: 1;
-    min-width: 250px;
-    border-style: solid;
+    margin-bottom: 0;
+    width: 80%;
 }
