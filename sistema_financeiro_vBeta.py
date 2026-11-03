@@ -3,6 +3,13 @@ import os
 import webbrowser
 from fasthtml.common import *
 
+# Programa criado com o objetivo de atender o trabalho 2026-4 - Projeto Integrador da UNISA.
+# este trabalho esta sendo realizado em grupo por:
+# Gildenei Leal
+# Phillipe
+# Izaque
+# Luciano
+
 # Inicializa o aplicativo FastHTML com Pico CSS habilitado e folha de estilo padrao.css
 app, retorno = fast_app(
     pico=True,
