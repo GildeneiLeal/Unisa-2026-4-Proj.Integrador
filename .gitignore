@@ -1,6 +1,7 @@
 main*.*
-dist/
-build/
+.sesskey
 *.spec
 __pycache__/
+dist/
+build/
 data/
