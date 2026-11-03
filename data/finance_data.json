@@ -26,5 +26,19 @@
         "tipo": "despesa",
         "categoria": "vestuario",
         "valor": 100.0
+    },
+    {
+        "codigo": 5,
+        "data": "31/10/2026",
+        "tipo": "receita",
+        "categoria": "salario",
+        "valor": 10000.0
+    },
+    {
+        "codigo": 6,
+        "data": "31/02/2027",
+        "tipo": "receita",
+        "categoria": "salario",
+        "valor": 1.0
     }
 ]

@@ -1,13 +1,28 @@
 import json
 import os
+import webbrowser
 from fasthtml.common import *
 
-# Inicializa o aplicativo FastHTML com Pico CSS habilitado e folha de estilo customizada
+# Inicializa o aplicativo FastHTML com Pico CSS habilitado e folha de estilo padrao.css
 app, retorno = fast_app(
     pico=True,
     hdrs=(Link(rel="stylesheet", href="/static/padrao.css"),),
 )
 
+# Categorias
+CATEGORIAS_VALIDAS = ["salario", "alimentacao", "vestuario", "saude", "transporte", "investimento", "imposto"]
+TIPOS_VALIDOS = ["receita", "despesa"]
+
+# Dicionário padronizado com mensagens de alerta de erro
+MENSAGENS = {
+    "valor_invalido": "O valor digitado deve ser positivo e maior que zero (R$ 0,00).",
+    "formato_valor": "Formato de valor numérico inválido. Por exemplo, utilize 50.00.",
+    "dominio_invalido": "Categoria ou Tipo de lançamento fora das opções permitidas.",
+    "codigo_duplicado": "Já existe um lançamento cadastrado com esse código.",
+    "data_invalida": "Data inválida! Verifique o dia, mês ou se o formato é DD/MM/AAAA (ex: 31/10/2026)."
+}
+
+# Arquivo de Dados
 ARQUIVO_DADOS = "data/finance_data.json"
 
 def garantir_diretorio_e_arquivo():
@@ -39,7 +54,6 @@ def selection_sort(transacoes, criterio="valor"):
                 if transacoes[j]["valor"] < transacoes[min_idx]["valor"]:
                     min_idx = j
             elif criterio == "data":
-                # Converte DD/MM/AAAA para AAAAMMDD para garantir comparação cronológica correta
                 data_j = transacoes[j]["data"]
                 data_min = transacoes[min_idx]["data"]
 
@@ -91,7 +105,7 @@ def converter_data_para_comparacao(data_str):
         return parts[2] + parts[1] + parts[0]
     return ""
 
-# Componente compartilhado do Menu Superior estruturado como Formulários/Botões de Ação
+# Componente compartilhado do Menu Superior
 def criar_menu_superior():
     return Form(
         Button("Cadastrar", type="submit", name="acao", value="cadastrar", style="width: 200px;"),
@@ -109,14 +123,46 @@ def criar_menu_superior():
         cls="menu-superior"
     )
 
+def validar_data(data_str):
+    if not data_str:
+        return False
+
+    partes = data_str.strip().split("/")
+    if len(partes) != 3:
+        return False
+
+    dia_str, mes_str, ano_str = partes
+
+    if not (dia_str.isdigit() and mes_str.isdigit() and ano_str.isdigit()):
+        return False
+
+    dia = int(dia_str)
+    mes = int(mes_str)
+    ano = int(ano_str)
+
+    if not (1 <= mes <= 12):
+        return False
+    if ano < 1900 or ano > 2100:
+        return False
+
+    dias_por_mes = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    bissexto = (ano % 4 == 0 and ano % 100 != 0) or (ano % 400 == 0)
+    if bissexto:
+        dias_por_mes[2] = 29
+
+    if not (1 <= dia <= dias_por_mes[mes]):
+        return False
+
+    return True
+
 @retorno("/")
 def get(criterio: str = "valor"):
-    # Redireciona a raiz para a rota estruturada de navegação com ação 'cadastrar'
+    # Redireciona a raiz para a rota de navegação
     return RedirectResponse("/navegar?acao=cadastrar", status_code=303)
 
-# Rota centralizadora para direcionar cada botão do menu superior para sua tela isolada
+# Rota centralizadora para direcionar cada botão do menu superior
 @retorno("/navegar", methods=["GET", "POST"])
-def navegar(acao: str = "cadastrar", criterio_ranking: str = "valor", busca_seq: str = "", busca_bin: str = "", data_inicio: str = "", data_fim: str = ""):
+def navegar(acao: str = "cadastrar", criterio_ranking: str = "valor", busca_seq: str = "", busca_bin: str = "", data_inicio: str = "", data_fim: str = "", erro: str = ""):
     menu_superior = criar_menu_superior()
 
     if acao == "cadastrar":
@@ -124,6 +170,13 @@ def navegar(acao: str = "cadastrar", criterio_ranking: str = "valor", busca_seq:
         total_receitas = sum(t["valor"] for t in transacoes if t["tipo"] == "receita")
         total_despesas = sum(t["valor"] for t in transacoes if t["tipo"] == "despesa")
         saldo = total_receitas - total_despesas
+
+        alerta_erro = ""
+        if erro in MENSAGENS:
+            alerta_erro = Div(
+                P(MENSAGENS[erro], style="margin: 0; font-weight: bold; color: #721c24;"),
+                style="background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin-bottom: 1rem;"
+            )
 
         form_cadastro = Form(
             Fieldset(
@@ -189,10 +242,10 @@ def navegar(acao: str = "cadastrar", criterio_ranking: str = "valor", busca_seq:
             Tbody(*tabela_linhas)
         ) if tabela_linhas else P("Nenhum lançamento encontrado ou cadastrado.")
 
-        # Correção aplicada aqui: agrupando o formulário e o resumo dentro do painel principal
         conteudo = Div(
             H1("Controle Orçamentário Familiar"),
             menu_superior,
+            alerta_erro,
             Div(
                 form_cadastro,
                 painel_resumo,
@@ -397,20 +450,48 @@ def navegar(acao: str = "cadastrar", criterio_ranking: str = "valor", busca_seq:
 
 @retorno("/adicionar", methods=["POST"])
 def post(data: str, tipo: str, categoria: str, valor: float):
-    transacoes = carregar()
-    novo_codigo = 1 if not transacoes else transacoes[-1]["codigo"] + 1
 
+    # 1. Validação de data válida
+    if not validar_data(data):
+        return RedirectResponse("/navegar?acao=cadastrar&erro=data_invalida", status_code=303)
+
+    # 2. Validação de Valor Positivo
+    try:
+        valor_float = float(valor)
+        if valor_float <= 0:
+            return RedirectResponse("/navegar?acao=cadastrar&erro=valor_invalido", status_code=303)
+    except ValueError:
+        return RedirectResponse("/navegar?acao=cadastrar&erro=formato_valor", status_code=303)
+
+    # 3. Validação de Lista Fixa de Domínio
+    if tipo not in TIPOS_VALIDOS or categoria not in CATEGORIAS_VALIDAS:
+        return RedirectResponse("/navegar?acao=cadastrar&erro=dominio_invalido", status_code=303)
+
+    transacoes = carregar()
+
+    # 4: Regra de validação de Cód
+    novo_codigo = 1 if not transacoes else transacoes[-1]["codigo"] + 1
+    codigo_existente = any(t["codigo"] == novo_codigo for t in transacoes)
+    if codigo_existente:
+        novo_codigo = max((t["codigo"] for t in transacoes), default=0) + 1
+
+    # 5: Montagem do dicionário Json
     novo = {
         "codigo": novo_codigo,
-        "data": data,
-        "tipo": tipo,
-        "categoria": categoria,
-        "valor": float(valor)
+        "data": data.strip(),
+        "tipo": tipo.strip().lower(),
+        "categoria": categoria.strip().lower(),
+        "valor": valor_float
     }
 
+    # 6: Persistência no JSON
     transacoes.append(novo)
     salvar(transacoes)
 
     return RedirectResponse("/navegar?acao=cadastrar", status_code=303)
 
-serve()
+# ABRIR O BROWSER AUTOMATICAMENTE AO EXECUTAR
+if __name__ == "__main__":
+    # Abre o navegador padrão na porta 5001 apontando para a rota inicial
+    webbrowser.open("http://localhost:5001")
+    serve(port=5001)

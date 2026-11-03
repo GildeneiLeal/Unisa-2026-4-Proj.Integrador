@@ -1,1 +1,6 @@
 main*.*
+dist/
+build/
+*.spec
+__pycache__/
+data/
