@@ -37,6 +37,30 @@ A versão `sistema_financeiro_vBeta.py` implementa validações defensivas no ba
 
 ### 💻 Como Executar a Aplicação
 
+#### instalando e configurando o Pyhton
+1. Baixe e instale o Python em seu sistema operacional
+https://python.org.br/instalacao-windows/
+
+2. Forçar a instalação e ativação do pip pelo Python
+Execute o comando abaixo para garantir que o gerenciador de pacotes seja instalado/atualizado corretamente na sua versão do Python:
+
+python -m ensurepip --upgrade
+
+3. Atualizar o pip para a versão mais recente
+
+python -m pip install --upgrade pip
+
+4. Instalar o FastHTML corretamente
+O nome oficial do pacote do FastHTML no registrador do Python é python-fasthtml. Instale-o utilizando o próprio Python para evitar erros de caminho:
+
+python -m pip install python-fasthtml
+
+5. Executar o seu sistema financeiro novamente
+Agora que o módulo foi instalado com sucesso no ambiente correto, rode o seu script:
+
+python sistema_financeiro_vBeta.py
+
+
 #### Opção 1: Direto via Python
 ```bash
 # Clone o repositório
