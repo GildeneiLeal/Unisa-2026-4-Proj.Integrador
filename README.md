@@ -37,7 +37,7 @@ A versão `sistema_financeiro_vBeta.py` implementa validações defensivas no ba
 
 ### 💻 Como Executar a Aplicação
 
-#### instalando e configurando o Pyhton
+#### Instalando e configurando o Pyhton
 1. Baixe e instale o Python em seu sistema operacional
 https://python.org.br/instalacao-windows/
 
